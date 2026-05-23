@@ -107,6 +107,7 @@ export class SatellitesShader {
       fragmentShader,
       side: THREE.DoubleSide,
       transparent: false,
+      vertexColors: true, // <-- ADD THIS LINE HERE
     });
 
     // Create instanced mesh

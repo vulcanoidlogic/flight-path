@@ -1,15 +1,18 @@
 // Per-instance curve control points (packed)
-attribute vec4 controlPointsPack1; // (p0.x, p0.y, p0.z, p1.x)
-attribute vec4 controlPointsPack2; // (p1.y, p1.z, p2.x, p2.y)
-attribute vec4 controlPointsPack3; // (p2.z, p3.x, p3.y, p3.z)
+attribute vec4 controlPointsPack1;
+attribute vec4 controlPointsPack2;
+attribute vec4 controlPointsPack3;
 
 // Per-instance rendering attributes
 attribute vec3 instanceColor;
 attribute float instanceScale;
 attribute float instanceElevation;
-attribute vec4 animationParams; // (phase, speed, rotation, visible)
+attribute vec4 animationParams;
 
-// Custom Uniforms (Keep these! Three.js doesn't provide them)
+// Geometry per-vertex attributes
+attribute vec3 color; // <-- ADD THIS EXPLICIT DECLARATION HERE
+
+// Custom Uniforms
 uniform float time;
 uniform float returnMode;
 uniform float paneVisibility;
