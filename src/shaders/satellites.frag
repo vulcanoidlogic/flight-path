@@ -7,12 +7,18 @@ void main() {
     discard;
   }
 
-  // Simple lighting using normal
   vec3 normal = normalize(vNormal);
-  vec3 light = normalize(vec3(1.0, 1.0, 1.0));
   
-  float diff = max(dot(normal, light), 0.0);
-  vec3 result = vColor * (0.3 + 0.7 * diff);
+  // Sun-like directional light coming slightly from above/side
+  vec3 lightDirection = normalize(vec3(1.0, 1.5, 1.0));
   
-  gl_FragColor = vec4(result, 1.0);
+  // Standard diffuse light calculation
+  float diff = max(dot(normal, lightDirection), 0.0);
+  
+  // Ambient baseline light so unlit faces don't drop to pitch black
+  float ambient = 0.25;
+  
+  vec3 finalColor = vColor * (ambient + (1.0 - ambient) * diff);
+  
+  gl_FragColor = vec4(finalColor, 1.0);
 }
