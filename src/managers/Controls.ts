@@ -51,6 +51,7 @@ interface ControlsContext {
   earthControlsManager?: EarthControlsManager | null;
   onStarCloudChange?: (value: boolean) => void;
   onStatsMeterChange?: (value: boolean) => void;
+  onUseSatellitesChange?: (value: boolean) => void;
   resetSunPosition: () => void;
 }
 
@@ -90,6 +91,7 @@ export class Controls {
       hidePath: false,
       numFlights: 5000,
       returnFlight: true,
+      useSatellites: false,
     };
   }
 
@@ -214,6 +216,7 @@ export class Controls {
       earthControlsManager,
       onStarCloudChange,
       onStatsMeterChange,
+      onUseSatellitesChange,
       resetSunPosition,
     } = this.context;
     const planeControlsManager = this.planeControlsManager;
@@ -301,6 +304,10 @@ export class Controls {
       },
       onReturnFlightChange: (value: boolean) => {
         flightControlsManager?.setReturnFlight(value);
+      },
+      onUseSatellitesChange: (value: boolean) => {
+        params.useSatellites = value;
+        onUseSatellitesChange?.(value);
       },
     };
   }
@@ -735,6 +742,15 @@ export class Controls {
       .onChange((value: boolean) => {
         if (this.callbacks.onHidePlaneChange) {
           this.callbacks.onHidePlaneChange(value);
+        }
+      });
+
+    this.controllers.useSatellites = planeFolder
+      .add(this.guiControls, "useSatellites")
+      .name("Use Satellites")
+      .onChange((value: boolean) => {
+        if (this.callbacks.onUseSatellitesChange) {
+          this.callbacks.onUseSatellitesChange(value);
         }
       });
 

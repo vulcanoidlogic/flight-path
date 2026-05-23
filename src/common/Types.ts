@@ -358,6 +358,7 @@ export interface ControlsCallbacks {
   onPlaneElevationChange?: (value: number) => void;
   onPaneStyleChange?: (value: string) => void;
   onHidePlaneChange?: (value: boolean) => void;
+  onUseSatellitesChange?: (value: boolean) => void;
 }
 
 export type KnownControllerKey =
@@ -458,6 +459,7 @@ export interface GuiParams {
   randomSpeed: boolean;
   starCloud: boolean;
   statsMeter: boolean;
+  useSatellites: boolean;
 }
 
 // =============================================================================

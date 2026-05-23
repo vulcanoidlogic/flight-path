@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Flight } from "./flights/Flight.ts";
 import { Curves } from "./curves/Curves.ts";
 import { PlanesShader } from "./planes/PlanesShader.ts";
+import { SatellitesShader } from "./satellites/SatellitesShader.ts";
 import { FlightUtils } from "./flights/FlightUtils.ts";
 import { Stars } from "./space/Stars.ts";
 import { Earth } from "./space/Earth.ts";
@@ -59,7 +60,7 @@ export class App {
 
   private flights: Flight[] = [];
   private mergedCurves: Curves | null = null;
-  private mergedPanes: PlanesShader | null = null;
+  private mergedPanes: PlanesShader | SatellitesShader | null = null;
   private stars: Stars | null = null;
   private earth: Earth | null = null;
   private initialCameraPositioned: boolean = false;
@@ -125,7 +126,7 @@ export class App {
     if (this.enableProfiling) t0 = performance.now();
 
     if (this.mergedPanes) {
-      this.mergedPanes.update(delta);
+      this.mergedPanes.update(delta, this.camera as any);
     }
 
     if (this.stars) {
@@ -213,6 +214,7 @@ export class App {
       returnFlight: true,
       starCloud: true,
       statsMeter: false,
+      useSatellites: false,
     } as GuiParams;
 
     this.controlsManager = new Controls();
@@ -325,6 +327,7 @@ export class App {
         earthControlsManager: this.earthControlsManager,
         onStarCloudChange: (value: boolean) => this.toggleStarCloud(value),
         onStatsMeterChange: (value: boolean) => this.toggleStatsMeter(value),
+        onUseSatellitesChange: (value: boolean) => this.toggleSatelliteMode(value),
         resetSunPosition,
       },
       {
@@ -401,6 +404,43 @@ export class App {
   private toggleStatsMeter(enabled: boolean): void {
     this.params.statsMeter = enabled;
     this.uiManager.setStatsVisible(enabled);
+  }
+
+  private toggleSatelliteMode(useSatellites: boolean): void {
+    this.params.useSatellites = useSatellites;
+
+    // Dispose current merged panes renderer
+    if (this.mergedPanes) {
+      if ("dispose" in this.mergedPanes && typeof this.mergedPanes.dispose === "function") {
+        this.mergedPanes.dispose();
+      } else {
+        // For PlanesShader which might not have dispose, just remove from scene
+        const mesh = (this.mergedPanes as any).getInstancedMesh?.();
+        if (mesh && this.scene.contains(mesh)) {
+          this.scene.remove(mesh);
+        }
+      }
+    }
+
+    // Create new merged panes renderer
+    if (useSatellites) {
+      this.mergedPanes = new SatellitesShader(this.scene, {
+        maxPanes: MAX_FLIGHTS,
+        baseSize: this.params.planeSize,
+        returnMode: this.params.returnFlight,
+        baseElevation: this.params.elevationOffset,
+      });
+    } else {
+      this.mergedPanes = new PlanesShader(this.scene, {
+        maxPanes: MAX_FLIGHTS,
+        baseSize: this.params.planeSize,
+        returnMode: this.params.returnFlight,
+        baseElevation: this.params.elevationOffset,
+      });
+    }
+
+    // Reinitialize flights with new renderer
+    this.initializeFlights();
   }
 
   private setupCamera(): void {
@@ -755,12 +795,21 @@ export class App {
       gapSize: this.params.gapSize,
     });
 
-    this.mergedPanes = new PlanesShader(this.scene, {
-      maxPanes: MAX_FLIGHTS,
-      baseSize: this.params.planeSize,
-      returnMode: this.params.returnFlight,
-      baseElevation: this.params.elevationOffset,
-    });
+    if (this.params.useSatellites) {
+      this.mergedPanes = new SatellitesShader(this.scene, {
+        maxPanes: MAX_FLIGHTS,
+        baseSize: this.params.planeSize,
+        returnMode: this.params.returnFlight,
+        baseElevation: this.params.elevationOffset,
+      });
+    } else {
+      this.mergedPanes = new PlanesShader(this.scene, {
+        maxPanes: MAX_FLIGHTS,
+        baseSize: this.params.planeSize,
+        returnMode: this.params.returnFlight,
+        baseElevation: this.params.elevationOffset,
+      });
+    }
 
     this.flightPathManager.applyDashPattern();
     this.applyPaneTexture();

@@ -393,7 +393,7 @@ export class PlanesShader {
    * Update time uniform - called once per frame
    * This is the ONLY method that needs to be called every frame!
    */
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, camera?: THREE.Camera): void {
     if (!this.material || !this.material.uniforms) return;
 
     this.material.uniforms.time.value += deltaTime;

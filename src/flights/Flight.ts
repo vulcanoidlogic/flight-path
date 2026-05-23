@@ -127,6 +127,10 @@ export class Flight {
         );
         this.mergedPanes.setTiltMode!(this.paneIndex, this.tiltMode);
         this._applyPaneTextureIndex();
+        // Make the pane visible
+        if (typeof this.mergedPanes.showPane === "function") {
+          this.mergedPanes.showPane(this.paneIndex);
+        }
       } else {
         // CPU-based panes: Just set initial color and size
         this.mergedPanes.setPaneColor(this.paneIndex, this.paneOptions.color);
