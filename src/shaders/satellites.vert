@@ -9,18 +9,8 @@ attribute float instanceScale;
 attribute float instanceElevation;
 attribute vec4 animationParams; // (phase, speed, rotation, visible)
 
-// Three.js built-in attributes for vertex-specific data
-attribute vec3 position;
-attribute vec3 color;
-attribute vec3 normal;
-
-// Uniforms
-uniform float time;
-uniform float returnMode;
-uniform float paneVisibility;
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
-uniform mat3 normalMatrix;
+// NOTE: Do NOT declare position, color, normal, projectionMatrix, 
+// modelViewMatrix, or normalMatrix here. Three.js injects them automatically!
 
 // Varyings
 varying vec3 vColor;
@@ -92,7 +82,7 @@ mat4 rotateAroundAxis(vec3 axis, float angle) {
 }
 
 void main() {
-  // Blend geometry part colors (chassis/panels) with the instance highlight color
+  // Blend geometry part colors (from our custom SatelliteGeometry buffer) with instance status colors
   vColor = color * instanceColor;
 
   float phase = animationParams.x;
@@ -128,10 +118,9 @@ void main() {
   float selfRotation = rotationRate * time;
   mat4 selfRotationMatrix = rotateAroundAxis(vec3(0.0, 0.0, 1.0), selfRotation);
   
-  // Combine custom rotation matrices 
   mat4 combinedRotation = rotationMatrix * selfRotationMatrix;
 
-  // FIX: Transform vertex normal using our custom orientation changes
+  // Transform vertex normal using our custom instance-space orientation changes
   vNormal = normalMatrix * (mat3(combinedRotation) * normal);
 
   vec3 scaledPosition = position * instanceScale;
