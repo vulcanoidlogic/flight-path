@@ -9,8 +9,19 @@ attribute float instanceScale;
 attribute float instanceElevation;
 attribute vec4 animationParams; // (phase, speed, rotation, visible)
 
-// NOTE: Do NOT declare position, color, normal, projectionMatrix, 
-// modelViewMatrix, or normalMatrix here. Three.js injects them automatically!
+// Custom Uniforms (Keep these! Three.js doesn't provide them)
+uniform float time;
+uniform float returnMode;
+uniform float paneVisibility;
+
+// NOTE: Three.js automatically prepends the following variables. 
+// Do not declare them manually:
+// attribute vec3 position;
+// attribute vec3 color;
+// attribute vec3 normal;
+// uniform mat4 modelViewMatrix;
+// uniform mat4 projectionMatrix;
+// uniform mat3 normalMatrix;
 
 // Varyings
 varying vec3 vColor;
